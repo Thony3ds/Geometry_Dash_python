@@ -9,6 +9,13 @@ clock = pygame.time.Clock()
 running = True
 
 while running:
+
+    #couleur de l'arrière plan mettre la couleur avant car sinon le bg sera derière la couleur
+    screen.fill((255, 0, 0))
+
+    #ajout de l'arrière plan dans l'app
+    screen.blit(bg, (0, 0))
+
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
