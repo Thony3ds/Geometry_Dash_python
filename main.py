@@ -86,8 +86,7 @@ while run:
         print('Again')
         counter = 0
     if quit.draw_button():
-        print('Quit')
-
+        run = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
