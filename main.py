@@ -3,15 +3,12 @@ from pygame.locals import *
 
 pygame.init()
 
-screen_width = 600
-screen_height = 600
+screen = pygame.display.set_mode((1080, 740))
+pygame.display.set_caption('Geometry of the cube')
 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Button Demo')
+font = pygame.font.SysFont('arialblack', 30)
 
-font = pygame.font.SysFont('Constantia', 30)
-
-bg = pygame.image.load("assets/images/background/background.png")
+bg = pygame.image.load("assets/images/bg/background.png")
 
 # define colours
 bg_color = (204, 102, 0)
@@ -21,8 +18,8 @@ white = (255, 255, 255)
 
 # define global variable
 clicked = False
-counter = 0
 
+clock = pygame.time.Clock()
 
 class button():
     # colours for button and text
@@ -77,8 +74,6 @@ class button():
 
 again = button(75, 200, 'Play Again?')
 quit = button(325, 200, 'Quit?')
-down = button(75, 350, 'Down')
-up = button(325, 350, 'Up')
 
 run = True
 while run:
@@ -90,21 +85,13 @@ while run:
         print('Again')
         counter = 0
     if quit.draw_button():
-        print('Quit')
-    if up.draw_button():
-        print('Up')
-        counter += 1
-    if down.draw_button():
-        print('Down')
-        counter -= 1
-
-    counter_img = font.render(str(counter), True, red)
-    screen.blit(counter_img, (280, 450))
-
+        run = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
+    #mettre a jour la fenètre
     pygame.display.update()
+    clock.tick(90)
 
 pygame.quit()
