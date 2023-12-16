@@ -3,15 +3,12 @@ from pygame.locals import *
 
 pygame.init()
 
-screen_width = 600
-screen_height = 600
-
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((1080, 740))
 pygame.display.set_caption('Geometry of the cube')
 
 font = pygame.font.SysFont('arialblack', 30)
 
-bg = pygame.image.load("assets/images/background/background.png")
+bg = pygame.image.load("assets/images/bg/background.png")
 
 # define colours
 bg_color = (204, 102, 0)
@@ -21,6 +18,8 @@ white = (255, 255, 255)
 
 # define global variable
 clicked = False
+
+clock = pygame.time.Clock()
 
 class button():
     # colours for button and text
@@ -91,6 +90,8 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+    #mettre a jour la fenètre
     pygame.display.update()
+    clock.tick(90)
 
 pygame.quit()
