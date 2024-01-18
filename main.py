@@ -1,97 +1,91 @@
 import pygame
 from pygame.locals import *
+from assets.levels.level1 import Level1
 
-pygame.init()
+# Constantes
+BG_COLOR = (204, 102, 0)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
-screen = pygame.display.set_mode((1080, 740))
-pygame.display.set_caption('Geometry of the cube')
+class Player:
+    def __init__(self, x, y, image_path):
+        self.image = pygame.image.load(image_path)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.x_speed = 0
+        self.y_speed = 0
+        self.jump = False
 
-font = pygame.font.SysFont('arialblack', 30)
+    def update(self):
+        keys = pygame.key.get_pressed()
+        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and not self.jump:
+            self.y_speed = -15
+            self.jump = True
+        self.y_speed += 1  # Gravité
+        self.rect.y += self.y_speed
 
-bg = pygame.image.load("assets/images/bg/background.png")
+        # Ajout du déplacement horizontal
+        self.x_speed = 0
+        if keys[pygame.K_LEFT]:
+            self.x_speed = -5
+        if keys[pygame.K_RIGHT]:
+            self.x_speed = 5
 
-# define colours
-bg_color = (204, 102, 0)
-red = (255, 0, 0)
-black = (0, 0, 0)
-white = (255, 255, 255)
+        self.rect.x += self.x_speed
 
-# define global variable
-clicked = False
+        if self.rect.bottom > 740:  # Limite inférieure de l'écran
+            self.rect.bottom = 740
+            self.jump = False
 
-clock = pygame.time.Clock()
+def main():
+    pygame.init()
 
-class button():
-    # colours for button and text
-    button_col = (255, 0, 0)
-    hover_col = (75, 225, 255)
-    click_col = (50, 150, 255)
-    text_col = black
-    width = 180
-    height = 70
+    screen = pygame.display.set_mode((1080, 740))
+    pygame.display.set_caption('Geometry Trash')
 
-    def __init__(self, x, y, text):
-        self.x = x
-        self.y = y
-        self.text = text
+    bg = pygame.image.load("assets/images/bg/background.png")
 
-    def draw_button(self):
+    # Initialisation du joueur
+    player = Player(300, 300, "assets/images/player_skins/cube.png")
+    # load the level
+    level1 = Level1()
+    level1.load_level()
+    level1.add_bottom_cube(1000)  # Ajoute un cube tout en bas de l'écran
 
-        global clicked
-        action = False
+    clock = pygame.time.Clock()
 
-        # get mouse position
-        pos = pygame.mouse.get_pos()
+    run = True
 
-        # create pygame Rect object for the button
-        button_rect = Rect(self.x, self.y, self.width, self.height)
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
-        # check mouseover and clicked conditions
-        if button_rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1:
-                clicked = True
-                pygame.draw.rect(screen, self.click_col, button_rect)
-            elif pygame.mouse.get_pressed()[0] == 0 and clicked == True:
-                clicked = False
-                action = True
-            else:
-                pygame.draw.rect(screen, self.hover_col, button_rect)
-        else:
-            pygame.draw.rect(screen, self.button_col, button_rect)
+        # Seul le niveau se déplace vers la gauche
+        for cube in level1.cubes:
+            cube.rect.x -= 5  # Ajustez la vitesse du déplacement
 
-        # add shading to button
-        pygame.draw.line(screen, white, (self.x, self.y), (self.x + self.width, self.y), 2)
-        pygame.draw.line(screen, white, (self.x, self.y), (self.x, self.y + self.height), 2)
-        pygame.draw.line(screen, black, (self.x, self.y + self.height), (self.x + self.width, self.y + self.height), 2)
-        pygame.draw.line(screen, black, (self.x + self.width, self.y), (self.x + self.width, self.y + self.height), 2)
+        # Mise à jour du joueur
+        player.update()
 
-        # add text to button
-        text_img = font.render(self.text, True, self.text_col)
-        text_len = text_img.get_width()
-        screen.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 25))
-        return action
+        # Vérifiez la collision avec les cubes du niveau
+        for cube in level1.cubes:
+            if player.rect.colliderect(cube.rect) and player.rect.x < cube.rect.x:
+                print("Collision avec le cube ! Game Over")
 
 
-again = button(75, 200, 'Play Again?')
-quit = button(325, 200, 'Quit?')
+        # Dessiner l'écran
+        screen.fill(BG_COLOR)
+        screen.blit(bg, (0, 0))  # Fond d'écran fixe
+        level1.draw(screen)  # Dessinez le niveau après le fond
+        screen.blit(player.image, player.rect)
 
-run = True
-while run:
+        pygame.display.update()
+        clock.tick(30)
 
-    screen.fill(bg_color)
-    screen.blit(bg, (0, 0))
+    pygame.quit()
 
-    if again.draw_button():
-        print('Again')
-        counter = 0
-    if quit.draw_button():
-        run = False
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+if __name__ == "__main__":
+    main()
 
-    #mettre a jour la fenètre
-    pygame.display.update()
-    clock.tick(90)
 
-pygame.quit()
